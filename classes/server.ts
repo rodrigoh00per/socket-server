@@ -4,7 +4,7 @@ import { isObject } from "util";
 import http from "http";
 import SocketIO from "socket.io";
 import * as socket from "../sockets/sockets";
-import { SSL_OP_COOKIE_EXCHANGE } from "constants";
+
 //recuerda instalar types/express
 
 export default class Server {
@@ -32,7 +32,12 @@ export default class Server {
     console.log("escuchando conexiones");
     //el on es para escuchar eventos
     this.io.on("connection", cliente => {
-      console.log("Cliente Conectado");
+      console.log("Cliente Conectado",cliente.id);
+
+      socket.conectarCliente(cliente);
+
+      //configurar usuario
+      socket.configurarUsuario(cliente, this.io);
 
       //mensajes
       socket.mensaje(cliente, this.io);
