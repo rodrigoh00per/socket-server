@@ -9,11 +9,9 @@
 import { Usuario } from "./usuario";
 
 export class UsuariosLista {
-  private lista: Usuario[];//Aqui vamos a agregar los usuarios conectados 
+  private lista: Usuario[] = []; //Aqui vamos a agregar los usuarios conectados
 
-  constructor() {
-    this.lista = [];
-  }
+  constructor() {}
   //agregamos un usuario
   agregar(usuario: Usuario) {
     this.lista.push(usuario);
@@ -27,11 +25,12 @@ export class UsuariosLista {
         usuario.nombre = nombre;
       }
     });
-   
   }
   //Regresa la lista de todos los usuarios que estan ahorita en el arreglo
   getLista() {
-    return this.lista;
+    return this.lista.filter(usuario => {
+      return usuario.nombre !== "sin-nombre";
+    });
   }
   //nos regresa un solo usuario
   getUsuario(id: String) {
@@ -47,14 +46,9 @@ export class UsuariosLista {
     let usuarioTemp = this.getUsuario(id);
 
     this.lista = this.lista.filter(usuario => {
-      return usuario.id! == id;
+      return usuario.id !== id;
     });
 
     return usuarioTemp;
   }
-
-
-
-
-  
 }

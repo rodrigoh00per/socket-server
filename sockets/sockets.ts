@@ -5,18 +5,20 @@ import { Usuario } from "../classes/usuario";
 
 export const usuariosLista = new UsuariosLista();
 //aqui estamos configurando el cliente por default
-export const conectarCliente = (cliente: Socket) => {
+export const conectarCliente = (cliente: Socket, io: socketIO.Server) => {
+  console.log("----------------------");
   let usuario = new Usuario(cliente.id);
   usuariosLista.agregar(usuario);
 };
 
-export const desconectar = (cliente: Socket) => {
+export const desconectar = (cliente: Socket, io: SocketIO.Server) => {
   //aqui detectamos cuando un cliente se desconecta
   cliente.on("disconnect", () => {
     console.log("Cliente desconectado");
     console.log("el usuario desconectado es ", cliente.id);
 
     usuariosLista.borrarUsuario(cliente.id);
+    io.emit("usuarios-activos", usuariosLista.getLista());
   });
 };
 
@@ -34,7 +36,20 @@ export const configurarUsuario = (cliente: Socket, io: socketIO.Server) => {
     (payload: { nombre: String }, callback: Function) => {
       usuariosLista.actualizarNombre(cliente.id, payload.nombre);
       console.log(usuariosLista.getLista().length);
-      callback({ ok: true, mensaje: `Usuario ${payload.nombre} configurado` });
+      io.emit("usuarios-activos", usuariosLista.getLista());
+
+      callback({
+        ok: true,
+        mensaje: `Usuario ${payload.nombre} configurado`
+      });
     }
   );
+};
+
+
+export const clientesConectados = (cliente: Socket, io: socketIO.Server) => {
+  cliente.on("clientes-conectados", () => {
+    console.log("entre a clientes conectados");
+    io.in(cliente.id).emit("usuarios-activos", usuariosLista.getLista());
+  });
 };
